@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>GIT search repository</title>
+    <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <!-- Basic styling -->
+    <link rel="stylesheet" href="./css/styles.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+
+
+
+
+    <script type="text/javascript">
+    let searchParams = new URLSearchParams(window.location.search);
+    let userId = searchParams.get('id');
+    
+        function transport(sch, link) {
+            createData(sch, link);
+        }
+        $(function () {
+            $(document).ready(function () {
+                $('.js_send').click(function () {
+                    createData($('#sch').val(), "");
+                });
+
+
+            });
+        });
+        createData();
+        function createData() {
+
+            
+            $("body").addClass("loading");
+            var xhr = jQuery.ajax({
+                type: 'POST',
+                url: 'http://localhost:3000/v1/api/gitapi/reports',
+                dataType: 'json',
+                contentType: "application/json; charset=UTF-8",
+                beforeSend: function (request) {
+                    request.setRequestHeader("authorization", "jwttoken");
+                },
+                success: function (data) {
+                   // alert(JSON.stringify(data));
+                    var table = "";
+                    jQuery('#main').empty();
+                    table += '<table id="table_id" class="display"><thead><tr><th>Keyword</th><th>Url</th><th>User</th><th>Date</th></tr></thead><tbody>';
+                    for (var i = 0; i < data.length; ++i) {
+                        table += "<tr><td>" + data[i].sch + "</td><td>" + data[i].link + "</td><td>" + data[i].userId + "</td><td>" + data[i].dateOfEntry + "</td></tr>";
+
+
+                    }
+                    table += "</tbody></table>";
+                    jQuery('#main').append(table);
+
+                    jQuery('#table_id').dataTable({
+                        "scrollY": "350px",
+                        "scrollCollapse": true,
+                        "bSort": false,
+                        "paging": true
+                    });
+                    $("body").removeClass("loading");
+                },
+				error: function (jqXHR, textStatus, errorThrown) {
+					alert(textStatus + ": " + jqXHR.status + " " + errorThrown);
+                    $("body").removeClass("loading");
+				}
+            });
+
+
+        }
+        
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto Condensed';
+            background: #fafafa;
+        }
+
+        .container {
+            margin: 150px auto;
+            max-width: 640px;
+        }
+
+        button {
+            padding: .5rem 1.5rem;
+            background: #34495E;
+            border: 0;
+            border-radius: 3px;
+            line-height: 24px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .jqpaginator .jqp-wrap .jqp-pages li {
+            margin: 0 5px;
+            background: #27AE60;
+            border: 0;
+            border-radius: 3px;
+            line-height: 24px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .jqpaginator .jqp-wrap .jqp-input {
+            margin: 10px auto;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        .container {
+    margin: 150px auto;
+    max-width: 1000px !important;
+}
+.overlay {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 999;
+            background: rgba(255, 255, 255, 0.8) url("loader.gif") center no-repeat;
+        }
+
+        /* Turn off scrollbar when body element has the loading class */
+        body.loading {
+            overflow: hidden;
+        }
+
+        /* Make spinner image visible when body element has the loading class */
+        body.loading .overlay {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="jquery-script-menu">
+        <div class="container">
+            
+            <div id="main"></div>
+        </div>
+        <div class="overlay"></div>
+
+</body>
+
+</html>
